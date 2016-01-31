@@ -32,14 +32,63 @@ Move by a line:
 	C-e      end of line
 move by a sentence:
 	M-a      back to beginning of sentence
-	 M-e     forward to end of sentence
+	M-e     forward to end of sentence
 move to the beggining of the texxt:
 	M-<
 move to the endof the texxt:
 	M->
+:::::::::::::::::::::::::::Managing Multiple Windows:::::::::::::::::::::::::::
+kill all windwos except 1:
+	C-x 1
+:::::::::::::::::::::::::::Insertion and Deletion:::::::::::::::::::::::::::
+Inserting too much into a line to make the line continue on the next line will make a '\' character appear at the end of the line:
+	example: "asfkdsjgfsalkjglfajdl;asnflaghpobi[pcxovk[0qoeroetie\" <--- '\' character
+	                  "salfdksaforeyh"
+It is possible to use C-u <number> <character> to add a character to a text multiple times
+delete the character just before the cursor:
+	<BackSpace/DelBack>
+delete the next character after the cursor:
+     	  C-d          
+kill(cut) the word immediately before the cursor:
+      	 M-<BackSpace/DelBack> 
+kill the next word after the cursor:
+    	  M-d          
+kill from the cursor position to end of line:
+    	  C-k         
+kill to the end of the current sentence:
+      	  M-k        
+yank(paste) the last killed text:
+	C-y
+change the last line to be yanked:(accepts negative and positive arguments)
+	M-y
+Undo:
+	C-x u	OR 	C-_
+marking(highlighting) test:
+	C-Space	(Activates marking mode)
+kill marked region:
+	C-w
+:::::::::::::::::::::::::::Making Files:::::::::::::::::::::::::::
+Files names appear at the bottom left
+find a file:
+	C-x C-f <fileName>
+save file:
+	C-x C-s 	(a new file's name starts with '~' after first save)
+list buffers:
+	C-x C-b
+go to current buffer:
+	C-x b <bufferName>
+save buffer:
+	C-x s 
 ::::::::::::::::::::::::::: :::::::::::::::::::::::::::
 do a command a certain number of times:
 	C-u <number> <EmacsCommand>
+count the number of lines:
+	C-x l
+temporarily suspend Emacs:
+	C-z
+to open the auto save file:
+	find the file
+	do:	M-x recover-file
 
 --------------------------------<From Rutges Web Page>--------------------------------
 https://www.cs.rutgers.edu/LCSR-Computing/some-docs/emacs-chart.html
