@@ -1,10 +1,20 @@
+This is for CompArch class stuff
 --------------------------------< Linux Shell Commands>--------------------------------
 to go into a directory:
 	cd <directoryName>
 to remove a directory:
 	rmdir <directoryName>
+remove directory including all of its children:
+	rm -rf <directoryName>
 to remove:
 	rm <fileName>
+--------------------------------< C Shell Commands>--------------------------------
+compile:(the output compiled file will be "a.out")
+	gcc <fileName>
+	switches:
+	-o	(indicate the name of the output file)
+run the output compiled file:
+	/<fileName>
 
 --------------------------------<Emacs Shell Commands>--------------------------------
 "M-" means hold Alt /Meta key. Can be replaced by pressing Esc (but not holding)
