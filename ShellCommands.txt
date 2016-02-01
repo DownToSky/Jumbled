@@ -89,6 +89,15 @@ go to current buffer:
 	C-x b <bufferName>
 save buffer:
 	C-x s 
+autosaved files are saved with a name like #fileName#
+to recover an autosaved file:
+	M-x recover-file	
+	then:
+	fileName
+to recover a lost session after a crash:
+	M-x recover-session
+	choose the interrupted session and do:
+	C-c C-c
 ::::::::::::::::::::::::::: :::::::::::::::::::::::::::
 do a command a certain number of times:
 	C-u <number> <EmacsCommand>
@@ -98,8 +107,11 @@ temporarily suspend Emacs:
 	C-z
 to open the auto save file:
 	find the file
-	do:	M-x recover-file
-
+	do:	
+	M-x recover-file
+--------------------------------< Questions>--------------------------------
+Is **argv exactly same as *argv[]? How are they the same?
+What extra credits can i get?
 --------------------------------<From Rutges Web Page>--------------------------------
 https://www.cs.rutgers.edu/LCSR-Computing/some-docs/emacs-chart.html
 Emacs command summary, Thu Jul 25.
