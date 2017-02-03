@@ -4,7 +4,8 @@ import requests
 REQ_DICT = {
         "REGION": "na",
         "REGION2" : "NA1",
-        "KEY": ""
+        "KEY": "",
+        "LEAGUE_TYPE" : "RANKED_FLEX_SR"
         }
 
 def get_player_id(player_names):
@@ -45,7 +46,28 @@ def get_current_game(summoner_id):
         return None
     return json.loads(req.text)
 
+def get_challenger_league():
+    URL = "https://{REGION}.api.pvp.net/api/lol/{REGION}/v2.5/league/challenger?type={LEAGUE_TYPE}&api_key={KEY}"
+    req = reqeusts.get(URL.format(**REQ_DICT))
+    if req.status != 200:
+        return None
+    return json.loads(req.text)
 
+def get_master_league():
+    URL = "https://{REGION}.api.pvp.net/api/lol/{REGION}/v2.5/league/master?type={LEAGUE_TYPE}&api_key={KEY}"
+    req = reqeusts.get(URL.format(**REQ_DICT))
+    if req.status != 200:
+        return None
+    return json.loads(req.text)
+
+def get_recent_games(summoner_id)
+    URL = "https://{REGION}.api.pvp.net/api/lol/{REGION}/v1.3/game/by-summoner/{ID}/recent?api_key={KEY}"
+    req = requests.get(URL.format(**REQ_DICT))
+    if req.status != 200:
+        return None
+    return json.loads(req.text)
+
+def get
 
 if __name__ == "__main__" :
     with open("info.json", "r") as key_file:
@@ -54,5 +76,7 @@ if __name__ == "__main__" :
     sum_id = "67030776"
     league = get_league([sum_id])
     entries = league[sum_id][0]["entries"]
+    print(len(entries))
     for e in entries:
-        print("{} {}".format(e["playerOrTeamName"],e["division"]))
+        if e["playerOrTeamName"].lower()[0] == 'q':
+            print("{} {}".format(e["playerOrTeamName"],e["division"]))
