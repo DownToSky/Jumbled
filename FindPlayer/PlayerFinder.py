@@ -1,6 +1,7 @@
 import json
 import requests
 import time
+import copy
 
 REQ_DICT = {
         "REGION": "na",
@@ -46,10 +47,35 @@ def get_league(ids):
     ids = ','.join(ids)
     URL = "https://{REGION}.api.pvp.net/api/lol/{REGION}/v2.5/league/by-summoner/{IDS}?api_key={KEY}"
     time.sleep(rate)
+    #print(URL.format(IDS = ids , **REQ_DICT))
     req = requests.get(URL.format(IDS = ids, **REQ_DICT))
     if req.status_code !=200:
         return None
     return json.loads(req.text)
+
+def get_plat_leagues(ids):
+    leagues = get_league(ids)
+    c = 0
+    while leagues == None and c<5:
+        leagues = get_league(ids)
+        print("NONE")
+        c+=1
+    if leagues == None:
+        return None
+    plats = dict()
+    for ID in ids:
+        if ID in leagues:
+            if leagues[ID][0]["queue"] == "RANKED_SOLO_5x5" and leagues[ID][0]["tier"] == "PLATINUM":
+                league_name = leagues[ID][0]["name"]
+                plats[league_name]=dict()
+                plats[league_name]["I"] = dict()
+                plats[league_name]["II"] = dict()
+                plats[league_name]["III"] = dict()
+                plats[league_name]["IV"] = dict()
+                plats[league_name]["V"] = dict()
+                for player in leagues[ID][0]["entries"]:
+                    plats[league_name][player["division"]][player["playerOrTeamId"]] = player["playerOrTeamName"]
+    return plats
 
 def get_current_game(summoner_id):
     URL = "https://{REGION}.api.pbp.net/observer-mode/rest/consumer/"
@@ -115,41 +141,49 @@ if __name__ == "__main__" :
             potPlats.add(line.strip())
     potPlats = list(potPlats)
     potPlats = [potPlats[x:x+10] for x in range(0, len(potPlats),10)]
-    PlatDivs = set()
     Plats = dict()
     for ids in potPlats:
         leagues = get_league(ids)
         for ID in ids:
             if ID not in leagues:
                 continue
-            if leagues[ID][0]["queue"] != "RANKED_SOLO_5x5":
-                print("NOT RANKED SOLO 5X5 "+ID)
-            if leagues[ID][0]["tier"] == "PLATINUM":
-                if not leagues[ID][0]["name"] in PlatDivs:
-                    print(leagues[ID][0]["name"])
-                    PlatDivs.add(leagues[ID][0]["name"])
-                    for player in leagues[ID][0]["entries"]:
-                        Plats[player["playerOrTeamId"]] = player["playerOrTeamName"]
-                print(len(Plats))
+            i = 0
+            for i in range(0,len(leagues[ID])):
+                if leagues[ID][i]["queue"] != "RANKED_SOLO_5x5":
+                    print("NOT RANKED SOLO 5X5 "+ID)
+                else:
+                    break
+            if leagues[ID][i]["tier"] == "PLATINUM":
+                league_name = leagues[ID][i]["name"]
+                if not league_name in Plats:
+                    print(league_name)
+                    Plats[league_name] = dict()
+                    Plats[league_name]['I'] = dict()
+                    Plats[league_name]['II'] = dict()
+                    Plats[league_name]['III'] = dict()
+                    Plats[league_name]['IV'] = dict()
+                    Plats[league_name]['V'] = dict()
+                    c = 0
+                    for player in leagues[ID][i]["entries"]:
+                        c+=1
+                        Plats[league_name][player["division"]][player["playerOrTeamId"]]=player["playerOrTeamName"]
+                    print(c)
     with open("plats.json", 'w') as platsF:
         json.dump(Plats,platsF)
-    with open("platDivs.json" , 'w')as divsF:
-        json.dump(list(PlatDivs), divsF)
-    print("total divisions: {} total plat players: {}".format(len(PlatDivs), len(Plats)))
     """
-
-
+    """
     Plats = set()
     PlatDivs = dict()
     with open("plats.json", 'r') as platF:
         Plats =json.load(platF)
     with open("platDivs.json", 'r')as divsF:
         PlatDivs = set(json.load(divsF))
+    PlatDivs = set()
     Plats = [val for val in Plats]
     Plats = [Plats[x:x+10] for x in range(0, len(Plats), 10)]
     for ids in Plats:
         leagues = get_league(ids)
-        if leagues != None:
+        if leagues == None:
             continue
         for ID in ids:
             if ID not in leagues:
@@ -160,7 +194,41 @@ if __name__ == "__main__" :
                 if not leagues[ID][0]["name"] in PlatDivs:
                     for player in leagues[ID][0]["entries"]:
                         if player["playerOrTeamName"].lower()[0] == "q":
-                            if player["division"] == "III":
+                            if player["division"] == "II":
+                                PlatDivs.add(leagues[ID][0]["name"])
                                 print(player["playerOrTeamName"])
-                        else:
-                            print(player["playerOrTeamName"])
+    """
+
+    plats = dict()
+    with open("plats.json", 'r')as platF:
+        plats = json.load(platF)
+    newPlats = copy.deepcopy(plats)
+    for n in plats:
+        for d in plats[n]:
+            for p in plats[n][d]:
+                games = get_recent_games(p)
+                if games == None or "games" not in games:
+                    print("GAME NOT FOUND")
+                    continue
+                for game in games["games"]:
+                    if game["subType"] == "RANKED_SOLO_5x5":
+                        idsToCheck = list()
+                        for player in game["fellowPlayers"]:
+                            idsToCheck.append(str(player["summonerId"]))
+                        tmp = get_plat_leagues(idsToCheck)
+                        if tmp == None:
+                            print("NONE")
+                            continue
+                        c = 0
+                        for divName in tmp:
+                            if divName not in newPlats:
+                                c+=1
+                                newPlats[divName] = tmp[divName]
+                                print(tmp[divName]["II"])
+                            else:
+                                print("DIV NAME ALREADY EXISTS")
+                        if c>0:
+                            with open("newPlats.json", 'w')as newPlatF:
+                                json.dump(newPlats , newPlatF)
+    with open("newPlats.json", 'w')as newPlatF:
+        json.dump(newPlats , newPlatF)
