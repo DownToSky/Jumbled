@@ -1,3 +1,3 @@
-myLast :: [a] -> a
-myLast [] =  
-myLast(x:xs) 
+myLast :: [a] -> a 
+myLast([x]) = x
+myLast(x:xs) = myLast(xs) 
